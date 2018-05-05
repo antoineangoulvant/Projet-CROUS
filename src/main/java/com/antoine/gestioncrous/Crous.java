@@ -7,7 +7,6 @@ import org.hibernate.Session;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
 
 public class Crous {
     private HashSet<Bien> biens;
@@ -16,7 +15,7 @@ public class Crous {
     private Fenetreprincipal maFenetre;
     private Session session;
 
-    public Crous(){
+    private Crous(){
         super();
         this.biens = new HashSet<Bien>();
         this.personnes = new HashSet<Personne>();
@@ -31,7 +30,7 @@ public class Crous {
         this.natures.add(n);
     }
 
-    public boolean invKeyNature(){
+    private boolean invKeyNature(){
         Boolean isConsistent = true;
         for(Nature n1 : natures){
             for(Nature n2 : natures){
@@ -64,8 +63,8 @@ public class Crous {
         return true;
     }
 
-    /*private void ajouterPersonne(String nom, String prenom, String adresse) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    public void ajouterPersonne(String nom, String prenom, String adresse) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
         Personne nouvelleP = new Personne();
@@ -75,7 +74,7 @@ public class Crous {
         session.save(nouvelleP);
 
         session.getTransaction().commit();
-    }*/
+    }
 
     public List getListeBiensNature(int id_nature){
         session = HibernateUtil.getSessionFactory().getCurrentSession();
