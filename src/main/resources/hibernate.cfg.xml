@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost/crous</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password"/>
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="show_sql">false</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+
+        <mapping resource="com/antoine/gestioncrous/model/Personne.hbm.xml"/>
+        <mapping resource="com/antoine/gestioncrous/model/Bien.hbm.xml"/>
+        <mapping resource="com/antoine/gestioncrous/model/Bail.hbm.xml"/>
+        <mapping resource="com/antoine/gestioncrous/model/Nature.hbm.xml"/>
+
+        <!-- DB schema will be updated if needed -->
+        <!-- <property name="hbm2ddl.auto">update</property> -->
+    </session-factory>
+</hibernate-configuration>

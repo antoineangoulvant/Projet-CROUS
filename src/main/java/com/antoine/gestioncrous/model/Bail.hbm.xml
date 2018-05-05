@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.antoine.gestioncrous.model">
+    <class name="Bail" table="BAIL">
+        <id name="id" column="ID_BAIL">
+            <generator class="native"/>
+        </id>
+        <property name="loyer" column="LOYER_BAIL"/>
+        <property name="debut" type="date" column="DEBUT_BAIL"/>
+        <property name="periode" column="PERIODE"/>
+        <many-to-one name="locataire" class="Personne" column="ID_LOCATAIRE"/>
+        <many-to-one name="bien" class="Bien" column="ID_BIEN"/>
+    </class>
+</hibernate-mapping>

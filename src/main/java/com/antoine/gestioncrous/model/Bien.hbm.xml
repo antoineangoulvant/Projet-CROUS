@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.antoine.gestioncrous.model">
+    <class name="Bien" table="BIEN">
+        <id name="id" column="ID_BIEN">
+            <generator class="native"/>
+        </id>
+        <property name="adresse" column="ADRESSE_BIEN"/>
+        <many-to-one name="nature" class="Nature" column="ID_NATURE"/>
+        <set name="bails" table="BAIL_BIEN" inverse="true">
+            <key column="ID_PERSONNE"/>
+            <one-to-many class="Bail"/> <!-- A voir -->
+        </set>
+        <many-to-one name="proprietaire" column="ID_PROPRIETAIRE" class="Personne"/>
+    </class>
+</hibernate-mapping>
