@@ -20,7 +20,7 @@ public class GestionPersonne extends JFrame implements ActionListener {
     private JButton ajouter;
     private JButton actualiser;
 
-    private public GestionPersonne(Crous c){
+    public GestionPersonne(Crous c){
         this.monCrous = c;
         this.setTitle("Gestion des personnes");
         this.setSize(600, 400);
