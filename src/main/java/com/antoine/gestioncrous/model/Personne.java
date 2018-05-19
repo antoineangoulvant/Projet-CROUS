@@ -61,4 +61,8 @@ public class Personne {
     public void setBails(Set bails) {
         this.bails = bails;
     }
+
+    public String toString(){
+        return prenom + " " + nom + "\n";
+    }
 }

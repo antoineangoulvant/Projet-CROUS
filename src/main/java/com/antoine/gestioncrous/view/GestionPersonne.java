@@ -20,7 +20,7 @@ public class GestionPersonne extends JFrame implements ActionListener {
     private JButton ajouter;
     private JButton actualiser;
 
-    public GestionPersonne(Crous c){
+    private public GestionPersonne(Crous c){
         this.monCrous = c;
         this.setTitle("Gestion des personnes");
         this.setSize(600, 400);
@@ -40,9 +40,7 @@ public class GestionPersonne extends JFrame implements ActionListener {
         dtm.setColumnIdentifiers(header);
         tableau.setModel(dtm);
 
-        List resultat = c.getListePersonnes();
-        for(Iterator i = resultat.iterator(); i.hasNext();){
-            Personne p = (Personne) i.next();
+        for(Personne p : monCrous.getPersonnes()){
             dtm.addRow(new Object[]{p.getId(),p.getPrenom(),p.getNom(),p.getAdresse()});
         }
 
