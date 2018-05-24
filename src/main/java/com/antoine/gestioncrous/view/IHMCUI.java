@@ -13,16 +13,16 @@ import java.util.*;
 
 public class IHMCUI {
     private Crous monCrous;
+    private Scanner sc;
 
     public IHMCUI(Crous c){
         this.monCrous = c;
+        sc = new Scanner(System.in);
         afficherMenu();
-
     }
 
     private void afficherMenu(){
         int choix;
-        Scanner sc = new Scanner(System.in);
 
         do{
             System.out.println(
@@ -37,7 +37,7 @@ public class IHMCUI {
                     "5  - Ajouter une personne\n" +
                     "6  - Ajouter un bien\n" +
                     "7  - Ajouter un bail\n" +
-                    "10 - Quitter"
+                    "10 - Quitter\n"
             );
             choix = sc.nextInt();
 
@@ -69,8 +69,19 @@ public class IHMCUI {
                     monCrous.ajouterPersonne(nom,prenom,adresse);
                     break;
                 case 6:
+                    System.out.println("Veuillez saisir les informations du bien : ");
+                    System.out.print("Adresse : ");
+                    sc.nextLine();
+                    String adresseBien = sc.nextLine();
+                    System.out.println("Appartement (1) | Garage (2) | Villa (3)");
+                    System.out.print("ID Nature : ");
+                    int id_nature = sc.nextInt();
+                    System.out.print("ID Propriétaire : ");
+                    int id_proprietaire = sc.nextInt();
+                    monCrous.ajouterBien(adresseBien,id_nature,id_proprietaire);
                     break;
                 case 7:
+                    afficherAjoutBail();
                     break;
                 case 10:
                     System.out.println("Fermeture... A bientôt !");
@@ -124,6 +135,30 @@ public class IHMCUI {
             System.out.println(String.format("| %-5s",bail.getId())+String.format(" | %-70s ",bail.getBien().getAdresse())+String.format(" | %-40s ",bail.getLocataire().getPrenom() + " " + bail.getLocataire().getNom())+String.format(" | %-4s ",bail.getLoyer())+String.format(" | %-10s ",bail.getDebut())+String.format(" | %-5s |",bail.getPeriode()));
         }
         System.out.println("+-------+-------------------------------------------------------------------------+-------------------------------------------+--------+-------------+-------+");
+    }
+
+    private void afficherAjoutBail(){
+        System.out.println("Veuillez saisir les informations du bail : ");
+        System.out.print("Montant du loyer : ");
+        double loyer = sc.nextDouble();
+        System.out.print("Jour du début : ");
+        int jourDebut = sc.nextInt();
+        System.out.print("Mois du début : ");
+        int moisDebut = sc.nextInt();
+        System.out.print("Année du début : ");
+        int anneeDebut = sc.nextInt();
+        System.out.print("Durée (en jours) : ");
+        int duree = sc.nextInt();
+        System.out.print("ID du bien : ");
+        int id_bien = sc.nextInt();
+        System.out.print("ID du locataire : ");
+        int id_locataire = sc.nextInt();
+
+        monCrous.ajouterBail(loyer,jourDebut,moisDebut,anneeDebut,duree,id_bien,id_locataire);
+    }
+
+    public void afficherErreur(String erreur){
+        System.out.print("Erreur : " + erreur);
     }
 }
 

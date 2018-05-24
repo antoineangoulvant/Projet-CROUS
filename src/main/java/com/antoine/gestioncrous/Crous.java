@@ -5,6 +5,7 @@ import com.antoine.gestioncrous.view.Fenetreprincipal;
 import com.antoine.gestioncrous.view.IHMCUI;
 import org.hibernate.Session;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -13,8 +14,10 @@ public class Crous {
     private HashSet<Personne> personnes;
     private HashSet<Bail> bails;
     private HashSet<Nature> natures;
+    private HashSet<Bien> biens;
     private Fenetreprincipal maFenetre;
     private Session session;
+    private IHMCUI monIhm;
 
     private Crous(){
         super();
@@ -23,6 +26,8 @@ public class Crous {
         this.bails = new HashSet<Bail>();
         this.natures = new HashSet<Nature>();
         this.actualiserValeurs();
+
+        monIhm = new IHMCUI(this);
     }
 
     private void actualiserValeurs() {
@@ -35,7 +40,7 @@ public class Crous {
             this.biens.add(bien);
         }
 
-        List listePersonnes = session.createQuery("From Personne ORDER BY id_personne").list();
+        List listePersonnes = session.createQuery("From Personne").list();
         for(Iterator i = listePersonnes.iterator(); i.hasNext();){
             Personne personne = (Personne) i.next();
             this.personnes.add(personne);
@@ -78,7 +83,7 @@ public class Crous {
     /*public boolean invXor(){
         Boolean isConsistent = true;
         for(Bien b : biens){
-            for(Bail l : b.getLoue()){
+            for(Bail l : b.getBails()){
                 isConsistent = isConsistent && (l.getLocataire() != b.getProprietaire());
             }
         }
@@ -111,18 +116,77 @@ public class Crous {
         session.getTransaction().commit();
     }
 
+    public void ajouterBail(double loyer, int jour, int mois, int annee, int periode, int id_bien, int id_locataire){
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Personne locataire = null;
+        for(Personne p : getPersonnes()){
+            if( p.getId() == id_locataire ){
+                locataire = p;
+            }
+        }
+
+        Bien tempBien = null;
+        for(Bien b : getBiens()){
+            if(b.getId() == id_bien){
+                tempBien = b;
+            }
+        }
+
+        Date dateDebut = new Date(annee-1900,mois-1,jour);
+        Bail nouveauBail = new Bail();
+        nouveauBail.setLoyer(loyer);
+        nouveauBail.setPeriode(periode);
+        nouveauBail.setLocataire(locataire);
+        nouveauBail.setBien(tempBien);
+        nouveauBail.setDebut(dateDebut);
+        session.save(nouveauBail);
+        bails.add(nouveauBail);
+
+        session.getTransaction().commit();
+    }
+
+    public void ajouterBien(String adresse,int id_nature, int id_proprietaire){
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Bien nouveauBien = new Bien();
+        nouveauBien.setAdresse(adresse);
+
+        Nature nature = null;
+        for(Nature n : getNatures()){
+            if( n.getId() == id_nature ){
+                nature = n;
+            }
+        }
+        nouveauBien.setNature(nature);
+
+        Personne proprietaire = null;
+        for(Personne p : getPersonnes()){
+            if( p.getId() == id_proprietaire ){
+                proprietaire = p;
+            }
+        }
+        nouveauBien.setProprietaire(proprietaire);
+
+        session.save(nouveauBien);
+        biens.add(nouveauBien);
+
+        session.getTransaction().commit();
+    }
+
     public List getListeBiensNature(int id_nature){
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         List resultat = session.createQuery("From Bien WHERE ID_NATURE = " + id_nature).list();
+        //session.getTransaction().commit();
         return resultat;
     }
 
     public void stopSession(){
         session.getTransaction().commit();
     }
-
-    private HashSet<Bien> biens;
 
     public HashSet<Bien> getBiens() {
         return biens;
@@ -141,8 +205,7 @@ public class Crous {
     }
 
     public static void main(String[] args){
-        Crous c = new Crous();
-        new IHMCUI(c);
+        new Crous();
         //new Fenetreprincipal(c);
     }
 }
