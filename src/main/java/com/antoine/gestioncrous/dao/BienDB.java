@@ -1,6 +1,5 @@
 package com.antoine.gestioncrous.dao;
 
-import com.antoine.gestioncrous.Crous;
 import com.antoine.gestioncrous.model.Bien;
 import com.antoine.gestioncrous.model.Nature;
 import com.antoine.gestioncrous.model.Personne;
@@ -24,13 +23,11 @@ public class BienDB {
         try {
             tx = session.beginTransaction();
             listeBiens = session.createQuery("From Bien").list();
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
         return listeBiens;
     }
@@ -47,13 +44,11 @@ public class BienDB {
             nouveauBien.setProprietaire(proprietaire);
 
             session.save(nouveauBien);
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
     }
 }

@@ -1,13 +1,9 @@
 package com.antoine.gestioncrous.view;
 
 import com.antoine.gestioncrous.Crous;
-import com.antoine.gestioncrous.HibernateUtil;
 import com.antoine.gestioncrous.model.Bail;
 import com.antoine.gestioncrous.model.Bien;
-import com.antoine.gestioncrous.model.Nature;
 import com.antoine.gestioncrous.model.Personne;
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
 
 import java.util.*;
 

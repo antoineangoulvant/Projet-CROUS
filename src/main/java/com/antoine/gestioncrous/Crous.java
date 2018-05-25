@@ -2,7 +2,6 @@ package com.antoine.gestioncrous;
 
 import com.antoine.gestioncrous.dao.*;
 import com.antoine.gestioncrous.model.*;
-import com.antoine.gestioncrous.view.Fenetreprincipal;
 import com.antoine.gestioncrous.view.IHMCUI;
 import org.hibernate.Session;
 
@@ -16,7 +15,6 @@ public class Crous {
     private HashSet<Bail> bails;
     private HashSet<Nature> natures;
     private HashSet<Bien> biens;
-    private Fenetreprincipal maFenetre;
     private ConnexionDB connexionDB;
     private IHMCUI monIhm;
 
@@ -75,7 +73,7 @@ public class Crous {
         Boolean isConsistent = true;
         for(Nature n1 : natures){
             for(Nature n2 : natures){
-                if(n1!=n2) isConsistent = isConsistent && (n1.getCode() != n2.getCode());
+                if(n1!=n2) isConsistent = isConsistent && (!n1.getCode().equals(n2.getCode()));
                 if(!isConsistent) return false;
             }
         }
@@ -88,7 +86,7 @@ public class Crous {
             Set listeBails = b.getBails();
             for(Iterator i = listeBails.iterator(); i.hasNext();){
                 Bail l = (Bail) i.next();
-                isConsistent = isConsistent && (l.getLocataire() != b.getProprietaire());
+                isConsistent = isConsistent && (!l.getLocataire().equals(b.getProprietaire()));
             }
         }
         return isConsistent;
@@ -99,11 +97,25 @@ public class Crous {
     }
 
     private boolean invKeyPersonne() {
-        return true;
+        Boolean isConsistent = true;
+        for(Personne p1 : personnes){
+            for(Personne p2 : personnes){
+                if(p1!=p2) isConsistent = isConsistent && (p1.getId() != p2.getId());
+                if(!isConsistent) return false;
+            }
+        }
+        return isConsistent;
     }
 
     private Boolean invKeyBien() {
-        return true;
+        Boolean isConsistent = true;
+        for(Bien b1 : biens){
+            for(Bien b2 : biens){
+                if(b1!=b2) isConsistent = isConsistent && (b1.getId() != b2.getId());
+                if(!isConsistent) return false;
+            }
+        }
+        return isConsistent;
     }
 
     public void ajouterPersonne(String nom, String prenom, String adresse){
@@ -208,7 +220,6 @@ public class Crous {
 
     public static void main(String[] args){
         new Crous();
-        //new Fenetreprincipal(c);
     }
 }
 

@@ -24,13 +24,11 @@ public class BailDB {
         try {
             tx = session.beginTransaction();
             listeBails = session.createQuery("From Bail").list();
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
         return listeBails;
     }
@@ -50,13 +48,11 @@ public class BailDB {
             nouveauBail.setDebut(dateDebut);
 
             session.save(nouveauBail);
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
     }
 }

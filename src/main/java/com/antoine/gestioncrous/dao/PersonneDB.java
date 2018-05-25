@@ -22,13 +22,11 @@ public class PersonneDB {
         try {
             tx = session.beginTransaction();
             listePersonnes = session.createQuery("From Personne").list();
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
         return listePersonnes;
     }
@@ -44,14 +42,11 @@ public class PersonneDB {
             nouvellePersonne.setPrenom(prenom);
             nouvellePersonne.setAdresse(adresse);
             session.save(nouvellePersonne);
-
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
     }
 }

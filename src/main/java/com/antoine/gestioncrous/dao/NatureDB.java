@@ -20,13 +20,11 @@ public class NatureDB {
         try {
             tx = session.beginTransaction();
             listeNatures = session.createQuery("From Nature").list();
+            tx.commit();
         }
         catch (HibernateException e){
             if(tx != null) tx.rollback();
             e.printStackTrace();
-        }
-        finally {
-            tx.commit();
         }
         return listeNatures;
     }
