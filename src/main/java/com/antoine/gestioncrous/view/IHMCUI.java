@@ -55,30 +55,13 @@ public class IHMCUI {
                     System.out.println("De quelle nature voulez vous afficher les biens ?");
                     System.out.println("Appartement (1) | Garage (2) | Villa (3)");
                     int choixNature = sc.nextInt();
-                    affichageBiensNature(choixNature);
+                    //affichageBiensNature(choixNature);
                     break;
                 case 5:
-                    System.out.println("Veuillez saisir les informations de la personne :");
-                    System.out.print("Prénom : ");
-                    sc.nextLine();
-                    String prenom = sc.nextLine();
-                    System.out.print("Nom : ");
-                    String nom = sc.nextLine();
-                    System.out.print("Adresse : ");
-                    String adresse = sc.nextLine();
-                    monCrous.ajouterPersonne(nom,prenom,adresse);
+                    afficherAjoutPersonne();
                     break;
                 case 6:
-                    System.out.println("Veuillez saisir les informations du bien : ");
-                    System.out.print("Adresse : ");
-                    sc.nextLine();
-                    String adresseBien = sc.nextLine();
-                    System.out.println("Appartement (1) | Garage (2) | Villa (3)");
-                    System.out.print("ID Nature : ");
-                    int id_nature = sc.nextInt();
-                    System.out.print("ID Propriétaire : ");
-                    int id_proprietaire = sc.nextInt();
-                    monCrous.ajouterBien(adresseBien,id_nature,id_proprietaire);
+                    afficherAjoutBien();
                     break;
                 case 7:
                     afficherAjoutBail();
@@ -94,7 +77,7 @@ public class IHMCUI {
 
     }
 
-    private void affichageBiensNature(int choixNature) {
+    /*private void affichageBiensNature(int choixNature) {
         List listeBiens = monCrous.getListeBiensNature(choixNature);
 
         System.out.println("+-------+----------------------------------------------------+-----------------+");
@@ -105,7 +88,7 @@ public class IHMCUI {
             System.out.println(String.format("| %-5s | ",bien.getId())+String.format("%-50s | ",bien.getAdresse())+String.format("%-15s |",bien.getNature().getCode()));
         }
         System.out.println("+-------+----------------------------------------------------+-----------------+");
-    }
+    }*/
 
     private void affichagePersonnes(){
         System.out.println("+-------+--------------------------------+--------------------------------+----------------------------------------------------------------------------------+");
@@ -118,13 +101,13 @@ public class IHMCUI {
     }
 
     private void affichageBiens(){
-        System.out.println("+-------+----------------------------------------------------+-----------------+");
-        System.out.println(String.format("| %-5s | ","ID")+String.format("%-50s | ","Adresse")+String.format("%-15s |","Nature"));
-        System.out.println("+-------+----------------------------------------------------+-----------------+");
+        System.out.println("+-------+----------------------------------------------------+--------------------------------+-----------------+");
+        System.out.println(String.format("| %-5s | ","ID")+String.format("%-50s | ","Adresse")+String.format("%-30s | ","Propriétaire")+String.format("%-15s |","Nature"));
+        System.out.println("+-------+----------------------------------------------------+--------------------------------+-----------------+");
         for(Bien bien : monCrous.getBiens()){
-            System.out.println(String.format("| %-5s | ",bien.getId())+String.format("%-50s | ",bien.getAdresse())+String.format("%-15s |",bien.getNature().getCode()));
+            System.out.println(String.format("| %-5s | ",bien.getId())+String.format("%-50s | ",bien.getAdresse())+String.format("%-30s | ",bien.getProprietaire().getPrenom()+" "+bien.getProprietaire().getNom())+String.format("%-15s |",bien.getNature().getCode()));
         }
-        System.out.println("+-------+----------------------------------------------------+-----------------+");
+        System.out.println("+-------+----------------------------------------------------+--------------------------------+-----------------+");
     }
 
     private void affichageBails(){
@@ -135,6 +118,31 @@ public class IHMCUI {
             System.out.println(String.format("| %-5s",bail.getId())+String.format(" | %-70s ",bail.getBien().getAdresse())+String.format(" | %-40s ",bail.getLocataire().getPrenom() + " " + bail.getLocataire().getNom())+String.format(" | %-4s ",bail.getLoyer())+String.format(" | %-10s ",bail.getDebut())+String.format(" | %-5s |",bail.getPeriode()));
         }
         System.out.println("+-------+-------------------------------------------------------------------------+-------------------------------------------+--------+-------------+-------+");
+    }
+
+    private void afficherAjoutPersonne(){
+        System.out.println("Veuillez saisir les informations de la personne :");
+        System.out.print("Prénom : ");
+        sc.nextLine();
+        String prenom = sc.nextLine();
+        System.out.print("Nom : ");
+        String nom = sc.nextLine();
+        System.out.print("Adresse : ");
+        String adresse = sc.nextLine();
+        monCrous.ajouterPersonne(nom,prenom,adresse);
+    }
+
+    private void afficherAjoutBien(){
+        System.out.println("Veuillez saisir les informations du bien : ");
+        System.out.print("Adresse : ");
+        sc.nextLine();
+        String adresseBien = sc.nextLine();
+        System.out.println("Appartement (1) | Garage (2) | Villa (3)");
+        System.out.print("ID Nature : ");
+        int id_nature = sc.nextInt();
+        System.out.print("ID Propriétaire : ");
+        int id_proprietaire = sc.nextInt();
+        monCrous.ajouterBien(adresseBien,id_nature,id_proprietaire);
     }
 
     private void afficherAjoutBail(){
@@ -155,10 +163,6 @@ public class IHMCUI {
         int id_locataire = sc.nextInt();
 
         monCrous.ajouterBail(loyer,jourDebut,moisDebut,anneeDebut,duree,id_bien,id_locataire);
-    }
-
-    public void afficherErreur(String erreur){
-        System.out.print("Erreur : " + erreur);
     }
 }
 

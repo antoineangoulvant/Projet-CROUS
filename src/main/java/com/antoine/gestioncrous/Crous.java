@@ -1,14 +1,15 @@
 package com.antoine.gestioncrous;
 
+import com.antoine.gestioncrous.dao.*;
 import com.antoine.gestioncrous.model.*;
 import com.antoine.gestioncrous.view.Fenetreprincipal;
 import com.antoine.gestioncrous.view.IHMCUI;
 import org.hibernate.Session;
 
-import java.sql.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Crous {
     private HashSet<Personne> personnes;
@@ -16,7 +17,7 @@ public class Crous {
     private HashSet<Nature> natures;
     private HashSet<Bien> biens;
     private Fenetreprincipal maFenetre;
-    private Session session;
+    private ConnexionDB connexionDB;
     private IHMCUI monIhm;
 
     private Crous(){
@@ -25,48 +26,49 @@ public class Crous {
         this.personnes = new HashSet<Personne>();
         this.bails = new HashSet<Bail>();
         this.natures = new HashSet<Nature>();
+        this.connexionDB = new ConnexionDB();
+
         this.actualiserValeurs();
 
         monIhm = new IHMCUI(this);
     }
 
     private void actualiserValeurs() {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+        Session session = connexionDB.getFactory().openSession();
 
-        List listeBiens = session.createQuery("From Bien").list();
-        for(Iterator i = listeBiens.iterator(); i.hasNext();){
-            Bien bien = (Bien) i.next();
-            this.biens.add(bien);
-        }
-
-        List listePersonnes = session.createQuery("From Personne").list();
+        personnes.clear();
+        PersonneDB personneDB = new PersonneDB(session);
+        List listePersonnes =  personneDB.getListePersonnes();
         for(Iterator i = listePersonnes.iterator(); i.hasNext();){
             Personne personne = (Personne) i.next();
             this.personnes.add(personne);
         }
 
-        List listeBails = session.createQuery("From Bail").list();
-        for(Iterator i = listeBails.iterator(); i.hasNext();){
-            Bail bail = (Bail) i.next();
-            this.bails.add(bail);
-        }
-
-        List listeNature = session.createQuery("From Nature").list();
+        natures.clear();
+        NatureDB natureDB = new NatureDB(session);
+        List listeNature = natureDB.getListeNatures();
         for(Iterator i = listeNature.iterator(); i.hasNext();){
             Nature nature = (Nature) i.next();
             this.natures.add(nature);
         }
 
-        session.getTransaction().commit();
-    }
+        biens.clear();
+        BienDB bienDB = new BienDB(session);
+        List listeBiens = bienDB.getListeBiens();
+        for(Iterator i = listeBiens.iterator(); i.hasNext();){
+            Bien bien = (Bien) i.next();
+            this.biens.add(bien);
+        }
 
-    public void ajouterBien(Bien b){
-        this.biens.add(b);
-    }
+        bails.clear();
+        BailDB bailDB = new BailDB(session);
+        List listeBails = bailDB.getListeBails();
+        for(Iterator i = listeBails.iterator(); i.hasNext();){
+            Bail bail = (Bail) i.next();
+            this.bails.add(bail);
+        }
 
-    public void ajouterNature(Nature n){
-        this.natures.add(n);
+        session.close();
     }
 
     private boolean invKeyNature(){
@@ -80,18 +82,20 @@ public class Crous {
         return isConsistent;
     }
 
-    /*public boolean invXor(){
+    public boolean invXor(){
         Boolean isConsistent = true;
         for(Bien b : biens){
-            for(Bail l : b.getBails()){
+            Set listeBails = b.getBails();
+            for(Iterator i = listeBails.iterator(); i.hasNext();){
+                Bail l = (Bail) i.next();
                 isConsistent = isConsistent && (l.getLocataire() != b.getProprietaire());
             }
         }
         return isConsistent;
-    }*/
+    }
 
     protected Boolean inv(){
-        return this.invKeyBien() && this.invKeyNature() && this.invKeyPersonne() /*&& this.invXor()*/;
+        return this.invKeyBien() && this.invKeyNature() && this.invKeyPersonne() && this.invXor();
     }
 
     private boolean invKeyPersonne() {
@@ -102,23 +106,49 @@ public class Crous {
         return true;
     }
 
-    public void ajouterPersonne(String nom, String prenom, String adresse) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+    public void ajouterPersonne(String nom, String prenom, String adresse){
+        Session session = connexionDB.getFactory().openSession();
+        new PersonneDB(session).ajouterPersonne(nom,prenom,adresse);
+        session.close();
+        actualiserValeurs();
+    }
 
-        Personne nouvelleP = new Personne();
-        nouvelleP.setNom(nom);
-        nouvelleP.setPrenom(prenom);
-        nouvelleP.setAdresse(adresse);
-        session.save(nouvelleP);
-        personnes.add(nouvelleP);
+    public void ajouterBien(String adresse,int id_nature, int id_proprietaire){
+        Session session = connexionDB.getFactory().openSession();
 
-        session.getTransaction().commit();
+        Personne proprietaire = null;
+        for(Personne p : getPersonnes()){
+            if( p.getId() == id_proprietaire ){
+                proprietaire = p;
+            }
+        }
+
+        Nature nature = null;
+        for(Nature n : getNatures()){
+            if( n.getId() == id_nature ){
+                nature = n;
+            }
+        }
+
+        if( nature != null ){
+            if( proprietaire != null ){
+                new BienDB(session).ajouterBien(adresse,nature,proprietaire);
+                session.close();
+                actualiserValeurs();
+            }
+            else{
+                session.close();
+                System.out.println("\n### Cette personne n'existe pas ###");
+            }
+        }
+        else{
+            session.close();
+            System.out.println("\n### Cette nature n'existe pas ###");
+        }
     }
 
     public void ajouterBail(double loyer, int jour, int mois, int annee, int periode, int id_bien, int id_locataire){
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+        Session session = connexionDB.getFactory().openSession();
 
         Personne locataire = null;
         for(Personne p : getPersonnes()){
@@ -134,59 +164,31 @@ public class Crous {
             }
         }
 
-        Date dateDebut = new Date(annee-1900,mois-1,jour);
-        Bail nouveauBail = new Bail();
-        nouveauBail.setLoyer(loyer);
-        nouveauBail.setPeriode(periode);
-        nouveauBail.setLocataire(locataire);
-        nouveauBail.setBien(tempBien);
-        nouveauBail.setDebut(dateDebut);
-        session.save(nouveauBail);
-        bails.add(nouveauBail);
-
-        session.getTransaction().commit();
-    }
-
-    public void ajouterBien(String adresse,int id_nature, int id_proprietaire){
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Bien nouveauBien = new Bien();
-        nouveauBien.setAdresse(adresse);
-
-        Nature nature = null;
-        for(Nature n : getNatures()){
-            if( n.getId() == id_nature ){
-                nature = n;
+        if(locataire != null){
+            if( tempBien != null ){
+                new BailDB(session).ajouterBail(loyer,jour,mois,annee,periode,tempBien,locataire);
+                session.close();
+                actualiserValeurs();
+            }
+            else{
+                session.close();
+                System.out.println("\n### Ce bien n'existe pas ###");
             }
         }
-        nouveauBien.setNature(nature);
-
-        Personne proprietaire = null;
-        for(Personne p : getPersonnes()){
-            if( p.getId() == id_proprietaire ){
-                proprietaire = p;
-            }
+        else{
+            session.close();
+            System.out.println("\n### Cette personne n'existe pas ###");
         }
-        nouveauBien.setProprietaire(proprietaire);
-
-        session.save(nouveauBien);
-        biens.add(nouveauBien);
-
-        session.getTransaction().commit();
     }
 
+    /*1
     public List getListeBiensNature(int id_nature){
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         List resultat = session.createQuery("From Bien WHERE ID_NATURE = " + id_nature).list();
         //session.getTransaction().commit();
         return resultat;
-    }
-
-    public void stopSession(){
-        session.getTransaction().commit();
-    }
+    }*/
 
     public HashSet<Bien> getBiens() {
         return biens;

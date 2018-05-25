@@ -15,7 +15,7 @@
             <one-to-many class="Bien"/>
         </set>
 
-        <set name="bails" table="PERSONNE_BAIL" inverse="true">
+        <set name="bails" table="PERSONNE_BAIL" inverse="true" lazy="false">
             <key column="ID_BAIL"/>
             <one-to-many class="Bail"/>
         </set>

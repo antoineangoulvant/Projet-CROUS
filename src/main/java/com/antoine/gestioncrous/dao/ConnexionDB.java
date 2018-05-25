@@ -1,4 +1,4 @@
-package com.antoine.gestioncrous.dal;
+package com.antoine.gestioncrous.dao;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -13,5 +13,9 @@ public class ConnexionDB {
             System.err.println("Création de la sessionFactory impossible : " + ex);
             throw new ExceptionInInitializerError(ex);
         }
+    }
+
+    public SessionFactory getFactory(){
+        return factory;
     }
 }
