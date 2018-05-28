@@ -4,6 +4,7 @@ import com.antoine.gestioncrous.dao.*;
 import com.antoine.gestioncrous.model.*;
 import com.antoine.gestioncrous.view.IHMCUI;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -193,14 +194,13 @@ public class Crous {
         }
     }
 
-    /*1
     public List getListeBiensNature(int id_nature){
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+        Session session = connexionDB.getFactory().openSession();
+        Transaction tx = session.beginTransaction();
         List resultat = session.createQuery("From Bien WHERE ID_NATURE = " + id_nature).list();
-        //session.getTransaction().commit();
+        tx.commit();
         return resultat;
-    }*/
+    }
 
     public HashSet<Bien> getBiens() {
         return biens;

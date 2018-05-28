@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='utf-8'?>
-<!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+        <!DOCTYPE hibernate-mapping PUBLIC
+                "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="com.antoine.gestioncrous.model">
-    <class name="Personne" table="PERSONNE">
-        <id name="id" column="ID_PERSONNE">
-            <generator class="native"/>
-        </id>
-        <property name="prenom" column="PRENOM_PERSONNE"/>
-        <property name="nom" column="NOM_PERSONNE"/>
-        <property name="adresse" column="ADRESSE_PERSONNE"/>
-        <set name="biens" table="BIEN" inverse="true">
-            <key column="ID_BIEN"/>
-            <one-to-many class="Bien"/>
-        </set>
+<class name="Personne" table="PERSONNE">
+    <id name="id" column="ID_PERSONNE">
+        <generator class="native"/>
+    </id>
+    <property name="prenom" column="PRENOM_PERSONNE"/>
+    <property name="nom" column="NOM_PERSONNE"/>
+    <property name="adresse" column="ADRESSE_PERSONNE"/>
+    <set name="biens" table="BIEN" inverse="true">
+        <key column="ID_BIEN"/>
+        <one-to-many class="Bien"/>
+    </set>
 
-        <set name="bails" table="PERSONNE_BAIL" inverse="true" lazy="false">
-            <key column="ID_BAIL"/>
-            <one-to-many class="Bail"/>
-        </set>
-    </class>
+    <set name="bails" table="PERSONNE_BAIL" inverse="true" lazy="false">
+        <key column="ID_BAIL"/>
+        <one-to-many class="Bail"/>
+    </set>
+</class>
 </hibernate-mapping>

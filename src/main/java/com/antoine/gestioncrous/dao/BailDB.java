@@ -55,4 +55,35 @@ public class BailDB {
             e.printStackTrace();
         }
     }
+
+    public void supprimerBail(int id_bail){
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Bail bail = (Bail) session.get(Bail.class,id_bail);
+            session.delete(bail);
+            tx.commit();
+        }
+        catch (HibernateException e){
+            if(tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public void actualiserBail(int id_bail, double loyer){
+        Transaction tx = null;
+
+        try{
+            tx = session.beginTransaction();
+            Bail bail = (Bail) session.get(Bail.class,id_bail);
+            bail.setLoyer(loyer);
+            session.update(bail);
+            tx.commit();
+        }
+        catch (HibernateException e){
+            if(tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
 }

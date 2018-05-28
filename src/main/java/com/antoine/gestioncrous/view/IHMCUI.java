@@ -51,7 +51,7 @@ public class IHMCUI {
                     System.out.println("De quelle nature voulez vous afficher les biens ?");
                     System.out.println("Appartement (1) | Garage (2) | Villa (3)");
                     int choixNature = sc.nextInt();
-                    //affichageBiensNature(choixNature);
+                    affichageBiensNature(choixNature);
                     break;
                 case 5:
                     afficherAjoutPersonne();
@@ -73,7 +73,7 @@ public class IHMCUI {
 
     }
 
-    /*private void affichageBiensNature(int choixNature) {
+    private void affichageBiensNature(int choixNature) {
         List listeBiens = monCrous.getListeBiensNature(choixNature);
 
         System.out.println("+-------+----------------------------------------------------+-----------------+");
@@ -84,7 +84,7 @@ public class IHMCUI {
             System.out.println(String.format("| %-5s | ",bien.getId())+String.format("%-50s | ",bien.getAdresse())+String.format("%-15s |",bien.getNature().getCode()));
         }
         System.out.println("+-------+----------------------------------------------------+-----------------+");
-    }*/
+    }
 
     private void affichagePersonnes(){
         System.out.println("+-------+--------------------------------+--------------------------------+----------------------------------------------------------------------------------+");
