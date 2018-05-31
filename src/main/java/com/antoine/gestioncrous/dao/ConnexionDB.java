@@ -8,17 +8,24 @@ import org.hibernate.cfg.Configuration;
  */
 public class ConnexionDB {
     private static SessionFactory factory;
+    private static ConnexionDB instance = null;
 
     /**
      * Constructeur et initialisation de l'instance de fabrication de session
      */
-    public ConnexionDB(){
-        try {
-            factory = new Configuration().configure().buildSessionFactory();
-        } catch (Throwable ex) {
-            System.err.println("Création de la sessionFactory impossible : " + ex);
-            throw new ExceptionInInitializerError(ex);
+    private ConnexionDB(){}
+
+    public static synchronized ConnexionDB getInstance(){
+        if(instance == null){
+            instance = new ConnexionDB();
+            try {
+                factory = new Configuration().configure().buildSessionFactory();
+            } catch (Throwable ex) {
+                System.err.println("Création de la sessionFactory impossible : " + ex);
+                throw new ExceptionInInitializerError(ex);
+            }
         }
+        return instance;
     }
 
     /**

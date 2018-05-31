@@ -7,16 +7,26 @@ import com.antoine.gestioncrous.model.Personne;
 
 import java.util.*;
 
+/**
+ * Classe permettant de faire l'interface de la console entre l'utilisateur et l'application
+ */
 public class IHMCUI {
     private Crous monCrous;
     private Scanner sc;
 
+    /**
+     * Constructeur de la classe IHMCUI
+     * @param c Controleur Crous
+     */
     public IHMCUI(Crous c){
         this.monCrous = c;
         sc = new Scanner(System.in);
         afficherMenu();
     }
 
+    /**
+     * Affichage du menu principal avec les choix
+     */
     private void afficherMenu(){
         int choix;
 
@@ -73,6 +83,10 @@ public class IHMCUI {
 
     }
 
+    /**
+     * Méthode permettant d'afficher les biens d'une nature
+     * @param choixNature identifiant d'une nature
+     */
     private void affichageBiensNature(int choixNature) {
         List listeBiens = monCrous.getListeBiensNature(choixNature);
 
@@ -86,6 +100,9 @@ public class IHMCUI {
         System.out.println("+-------+----------------------------------------------------+-----------------+");
     }
 
+    /**
+     * Méthode permettant d'afficher la liste de personnes
+     */
     private void affichagePersonnes(){
         System.out.println("+-------+--------------------------------+--------------------------------+----------------------------------------------------------------------------------+");
         System.out.println(String.format("| %-5s","ID")+String.format(" | %-30s | ","Prénom")+String.format("%-30s | ","Nom")+String.format("%-80s |","Adresse"));
@@ -96,6 +113,9 @@ public class IHMCUI {
         System.out.println("+-------+--------------------------------+--------------------------------+----------------------------------------------------------------------------------+");
     }
 
+    /**
+     * Methode permettant d'afficher la liste des biens
+     */
     private void affichageBiens(){
         System.out.println("+-------+----------------------------------------------------+--------------------------------+-----------------+");
         System.out.println(String.format("| %-5s | ","ID")+String.format("%-50s | ","Adresse")+String.format("%-30s | ","Propriétaire")+String.format("%-15s |","Nature"));
@@ -106,6 +126,9 @@ public class IHMCUI {
         System.out.println("+-------+----------------------------------------------------+--------------------------------+-----------------+");
     }
 
+    /**
+     * Methode permettant d'afficher la liste des bails
+     */
     private void affichageBails(){
         System.out.println("+-------+-------------------------------------------------------------------------+-------------------------------------------+--------+-------------+-------+");
         System.out.println(String.format("| %-5s","ID")+String.format(" | %-70s ","Adresse du bien")+String.format(" | %-40s ","Locataire")+String.format(" | %-4s ","Loyer")+String.format(" | %-10s ","Date début")+String.format(" | %-5s |","Durée"));
@@ -116,6 +139,9 @@ public class IHMCUI {
         System.out.println("+-------+-------------------------------------------------------------------------+-------------------------------------------+--------+-------------+-------+");
     }
 
+    /**
+     * Affichage de la saisie de l'ajout d'une personne
+     */
     private void afficherAjoutPersonne(){
         System.out.println("Veuillez saisir les informations de la personne :");
         System.out.print("Prénom : ");
@@ -128,6 +154,9 @@ public class IHMCUI {
         monCrous.ajouterPersonne(nom,prenom,adresse);
     }
 
+    /**
+     * Affichage de la saisie de l'ajout d'un bien
+     */
     private void afficherAjoutBien(){
         System.out.println("Veuillez saisir les informations du bien : ");
         System.out.print("Adresse : ");
@@ -141,6 +170,9 @@ public class IHMCUI {
         monCrous.ajouterBien(adresseBien,id_nature,id_proprietaire);
     }
 
+    /**
+     * Affichage de la saisie de l'ajout d'un bail
+     */
     private void afficherAjoutBail(){
         System.out.println("Veuillez saisir les informations du bail : ");
         System.out.print("Montant du loyer : ");

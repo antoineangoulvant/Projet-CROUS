@@ -1,75 +1,46 @@
 package com.antoine.gestioncrous;
 
-import com.antoine.gestioncrous.dao.*;
 import com.antoine.gestioncrous.model.*;
 import com.antoine.gestioncrous.view.IHMCUI;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Classe centrale de l'application qui fait office de controleur
+ */
 public class Crous {
     private HashSet<Personne> personnes;
     private HashSet<Bail> bails;
     private HashSet<Nature> natures;
     private HashSet<Bien> biens;
-    private ConnexionDB connexionDB;
     private IHMCUI monIhm;
 
+    /**
+     * Constructeur de la classe CROUS
+     */
     private Crous(){
         super();
         this.biens = new HashSet<Bien>();
         this.personnes = new HashSet<Personne>();
         this.bails = new HashSet<Bail>();
         this.natures = new HashSet<Nature>();
-        this.connexionDB = new ConnexionDB();
 
         this.actualiserValeurs();
 
         monIhm = new IHMCUI(this);
     }
 
-    private void actualiserValeurs() {
-        Session session = connexionDB.getFactory().openSession();
-
-        personnes.clear();
-        PersonneDB personneDB = new PersonneDB(session);
-        List listePersonnes =  personneDB.getListePersonnes();
-        for(Iterator i = listePersonnes.iterator(); i.hasNext();){
-            Personne personne = (Personne) i.next();
-            this.personnes.add(personne);
-        }
-
-        natures.clear();
-        NatureDB natureDB = new NatureDB(session);
-        List listeNature = natureDB.getListeNatures();
-        for(Iterator i = listeNature.iterator(); i.hasNext();){
-            Nature nature = (Nature) i.next();
-            this.natures.add(nature);
-        }
-
-        biens.clear();
-        BienDB bienDB = new BienDB(session);
-        List listeBiens = bienDB.getListeBiens();
-        for(Iterator i = listeBiens.iterator(); i.hasNext();){
-            Bien bien = (Bien) i.next();
-            this.biens.add(bien);
-        }
-
-        bails.clear();
-        BailDB bailDB = new BailDB(session);
-        List listeBails = bailDB.getListeBails();
-        for(Iterator i = listeBails.iterator(); i.hasNext();){
-            Bail bail = (Bail) i.next();
-            this.bails.add(bail);
-        }
-
-        session.close();
+    public void actualiserValeurs(){
+        Model.getInstance().actualiserValeurs(this);
     }
 
+    /**
+     * Methode permettant de vérifier la consistance des données d'une nature et d'éviter la duplication
+     * @return vrai si le consistance est respectée
+     */
     private boolean invKeyNature(){
         Boolean isConsistent = true;
         for(Nature n1 : natures){
@@ -81,6 +52,10 @@ public class Crous {
         return isConsistent;
     }
 
+    /**
+     * Méthode permettant de vérifier qu'un propriétaire ne peut pas louer un bien ou qu'un locataire ne peut pas être propriétaire
+     * @return vrai si le consistance est respectée
+     */
     public boolean invXor(){
         Boolean isConsistent = true;
         for(Bien b : biens){
@@ -93,10 +68,10 @@ public class Crous {
         return isConsistent;
     }
 
-    protected Boolean inv(){
-        return this.invKeyBien() && this.invKeyNature() && this.invKeyPersonne() && this.invXor();
-    }
-
+    /**
+     * Methode permettant de vérifier la consistance des données d'une personne et d'éviter la duplication
+     * @return vrai si le consistance est respectée
+     */
     private boolean invKeyPersonne() {
         Boolean isConsistent = true;
         for(Personne p1 : personnes){
@@ -108,6 +83,10 @@ public class Crous {
         return isConsistent;
     }
 
+    /**
+     * Methode permettant de vérifier la consistance des données d'un bien et d'éviter la duplication
+     * @return vrai si le consistance est respectée
+     */
     private Boolean invKeyBien() {
         Boolean isConsistent = true;
         for(Bien b1 : biens){
@@ -119,105 +98,82 @@ public class Crous {
         return isConsistent;
     }
 
-    public void ajouterPersonne(String nom, String prenom, String adresse){
-        Session session = connexionDB.getFactory().openSession();
-        new PersonneDB(session).ajouterPersonne(nom,prenom,adresse);
-        session.close();
-        actualiserValeurs();
+    /**
+     * Méthode d'appel de toutes les classes de vérifications de la consistance
+     * @return vrai si le consistance est respectée
+     */
+    protected Boolean inv(){
+        return this.invKeyBien() && this.invKeyNature() && this.invKeyPersonne() && this.invXor();
     }
 
     public void ajouterBien(String adresse,int id_nature, int id_proprietaire){
-        Session session = connexionDB.getFactory().openSession();
+        Model.getInstance().ajouterBien(adresse,id_nature,id_proprietaire,this);
+    }
 
-        Personne proprietaire = null;
-        for(Personne p : getPersonnes()){
-            if( p.getId() == id_proprietaire ){
-                proprietaire = p;
-            }
-        }
-
-        Nature nature = null;
-        for(Nature n : getNatures()){
-            if( n.getId() == id_nature ){
-                nature = n;
-            }
-        }
-
-        if( nature != null ){
-            if( proprietaire != null ){
-                new BienDB(session).ajouterBien(adresse,nature,proprietaire);
-                session.close();
-                actualiserValeurs();
-            }
-            else{
-                session.close();
-                System.out.println("\n### Cette personne n'existe pas ###");
-            }
-        }
-        else{
-            session.close();
-            System.out.println("\n### Cette nature n'existe pas ###");
-        }
+    public void ajouterPersonne(String nom, String prenom, String adresse){
+        Model.getInstance().ajouterPersonne(nom,prenom,adresse,this);
     }
 
     public void ajouterBail(double loyer, int jour, int mois, int annee, int periode, int id_bien, int id_locataire){
-        Session session = connexionDB.getFactory().openSession();
-
-        Personne locataire = null;
-        for(Personne p : getPersonnes()){
-            if( p.getId() == id_locataire ){
-                locataire = p;
-            }
-        }
-
-        Bien tempBien = null;
-        for(Bien b : getBiens()){
-            if(b.getId() == id_bien){
-                tempBien = b;
-            }
-        }
-
-        if(locataire != null){
-            if( tempBien != null ){
-                new BailDB(session).ajouterBail(loyer,jour,mois,annee,periode,tempBien,locataire);
-                session.close();
-                actualiserValeurs();
-            }
-            else{
-                session.close();
-                System.out.println("\n### Ce bien n'existe pas ###");
-            }
-        }
-        else{
-            session.close();
-            System.out.println("\n### Cette personne n'existe pas ###");
-        }
+        Model.getInstance().ajouterBail(loyer,jour,mois,annee,periode,id_bien,id_locataire,this);
     }
 
     public List getListeBiensNature(int id_nature){
-        Session session = connexionDB.getFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        List resultat = session.createQuery("From Bien WHERE ID_NATURE = " + id_nature).list();
-        tx.commit();
-        return resultat;
+        return Model.getInstance().getListeBiensNature(id_nature);
     }
 
+    /**
+     * Méthode permettant de récupérer les biens de l'application
+     * @return liste des biens de l'application
+     */
     public HashSet<Bien> getBiens() {
         return biens;
     }
 
+    /**
+     * Méthode permettant de récupérer les personnes de l'application
+     * @return liste des personnes de l'application
+     */
     public HashSet<Personne> getPersonnes() {
         return personnes;
     }
 
+    /**
+     * Méthode permettant de récupérer les bails de l'application
+     * @return liste des biens de l'application
+     */
     public HashSet<Bail> getBails() {
         return bails;
     }
 
+    /**
+     * Méthode permettant de récupérer les natures de l'application
+     * @return liste des natures de l'application
+     */
     public HashSet<Nature> getNatures() {
         return natures;
     }
 
+    public void setPersonnes(HashSet<Personne> personnes) {
+        this.personnes = personnes;
+    }
+
+    public void setBails(HashSet<Bail> bails) {
+        this.bails = bails;
+    }
+
+    public void setNatures(HashSet<Nature> natures) {
+        this.natures = natures;
+    }
+
+    public void setBiens(HashSet<Bien> biens) {
+        this.biens = biens;
+    }
+
+    /**
+     * Méthode permettant de lancer l'application
+     * @param args valeurs passés en paramètres (inutile)
+     */
     public static void main(String[] args){
         new Crous();
     }
